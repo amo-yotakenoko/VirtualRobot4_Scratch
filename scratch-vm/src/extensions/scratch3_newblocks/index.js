@@ -10,7 +10,15 @@ class Scratch3NewBlocks {
         this.socket = null;
         this.response = {};
         this.id = 0;
+        this.virtualQueueCount = 0;
+        setInterval(() => {
+            if (this.virtualQueueCount > 0) {
 
+                this.virtualQueueCount--;
+                console.log(this.virtualQueueCount)
+            }
+
+        }, 30);
     }
 
     getInfo() {
@@ -122,18 +130,30 @@ class Scratch3NewBlocks {
             this.socket.send('Scratchから接続しました');
         };
 
-        // メッセージを受け取った時の処理
         this.socket.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log("parsed data:", data);
-            if (data.result === "True")
-                data.result = true;
-            if (data.result === "False")
-                data.result = false;
+            try {
+                const data = JSON.parse(event.data);
+                console.log(event.data);
 
-            console.log(data.id, data.result);
-            this.response[data.id] = data.result;
-            console.log(this.response);
+                if ("queueCount" in data) {
+                    console.log("キューカウント" + data["queueCount"])
+                    this.queueCount = data["queueCount"];
+                }
+
+                if ("result" in data) {
+                    if (data.result === "True") data.result = true;
+                    if (data.result === "False") data.result = false;
+
+                    console.log(data.id, data.result);
+
+
+                    this.response[data.id] = data.result;
+                    console.log(this.response);
+
+                }
+            } catch (error) {
+                console.error("Error handling WebSocket message:", error, event.data);
+            }
         };
 
         // エラーが発生した時の処理
@@ -159,26 +179,35 @@ class Scratch3NewBlocks {
 
 
     set(args) {
-        console.log(args);
-        // if (this.sig[args.KEY] != args.VALUE) {
-        //     this.sig[args.KEY] = args.VALUE;
-        // }
-        const message = {
-            type: "set",
-            key: args.KEY,
-            value: args.VALUE,
-            id: this.id++
-        };
-        console.log(message);
-        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify(message));
-        }
+        return new Promise(async (resolve) => {
+            console.log(args);
 
+            const message = {
+                type: "set",
+                key: args.KEY,
+                value: args.VALUE,
+                id: this.id++
+            };
+
+            console.log(message);
+            console.log("this.virtualQueueCount", this.virtualQueueCount);
+            while (this.virtualQueueCount > 10) {
+                console.log("送りすぎ", this.virtualQueueCount);
+                await new Promise(r => setTimeout(r, 10)); // 0.1秒待機
+            }
+
+            this.virtualQueueCount += 1;
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send(JSON.stringify(message));
+            }
+
+            resolve();
+        });
     }
 
     morter(args) {
 
-        this.set({ ...args, KEY: args.KEY + ".power" })
+        return this.set({ ...args, KEY: args.KEY + ".power" })
     }
 
 
@@ -197,7 +226,7 @@ class Scratch3NewBlocks {
 
         let startTime = performance.now(); // 現在の時間を取得
         while (performance.now() - startTime < 1000) { // 1秒間繰り返す
-            console.log("1秒間繰り返す");
+
             await new Promise(resolve => {
                 requestAnimationFrame(resolve); // 次のフレームを待つ
             });
@@ -218,10 +247,7 @@ class Scratch3NewBlocks {
         return this.get({ ...args, KEY: "key." + args.KEY })
     }
 
-    morter(args) {
 
-        this.set({ ...args, KEY: args.KEY + ".power" })
-    }
 
     hat(args) {
         return this.sig[args.KEY] == args.VALUE;
