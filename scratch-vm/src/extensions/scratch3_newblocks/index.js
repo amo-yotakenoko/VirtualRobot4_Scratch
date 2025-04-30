@@ -79,6 +79,21 @@ class Scratch3NewBlocks {
                     }
                 },
                 {
+                    opcode: 'servo',
+                    blockType: BlockType.COMMAND,
+                    text: 'サーボモーター[KEY]を[VALUE]°にする',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "A"
+                        },
+                        VALUE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        }
+                    }
+                },
+                {
                     opcode: 'get',
                     blockType: BlockType.REPORTER,
                     text: 'Key:[KEY]',
@@ -208,6 +223,10 @@ class Scratch3NewBlocks {
     morter(args) {
 
         return this.set({ ...args, KEY: args.KEY + ".power" })
+    }
+    servo(args) {
+
+        return this.set({ ...args, KEY: args.KEY + ".angle" })
     }
 
 

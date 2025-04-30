@@ -1,6 +1,7 @@
 
  git clone --depth 1 https://github.com/llk/scratch-vm.git
  git clone --depth 1 https://github.com/llk/scratch-gui.git
+
  cd scratch-vm &&sudo npm install && npm link
 
 cd ../
@@ -13,3 +14,6 @@ cd ../
  npm install
 
  npm start
+
+
+  git clone --depth 1  https://github.com/LLK/scratch-desktop.git
