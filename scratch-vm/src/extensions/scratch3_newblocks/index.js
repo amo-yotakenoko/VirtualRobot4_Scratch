@@ -6,19 +6,20 @@ const virtualrobot_send = require('../../util/virtualrobot_send');
 class Scratch3NewBlocks {
     constructor(runtime) {
         this.runtime = runtime;
-        // this.sig = {};
-        // this.socket = null;
-        // this.response = {};
-        // this.id = 0;
-        // this.virtualQueueCount = 0;
-        // setInterval(() => {
-        //     if (this.virtualQueueCount > 0) {
 
-        //         this.virtualQueueCount--;
-        //         console.log(this.virtualQueueCount)
-        //     }
+        this.socket = null;
+        this.response = {};
+        this.id = 0;
+        this.virtualQueueCount = 0;
+        this.httpURL = "http://localhost:8080/";
+        setInterval(() => {
+            if (this.virtualQueueCount > 0) {
 
-        // }, 30);
+                this.virtualQueueCount--;
+                console.log(this.virtualQueueCount)
+            }
+
+        }, 30);
     }
 
     getInfo() {
@@ -27,42 +28,40 @@ class Scratch3NewBlocks {
             name: 'New Blocks',
             blocks: [
 
-                // {
-                //     opcode: 'connect',
-                //     blockType: BlockType.COMMAND,
-                //     text: '接続[URL]',
-                //     arguments: {
-                //         URL: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: "ws://localhost:12345"
-                //         },
-
-                //     }
-                // },
-                // {
-                //     opcode: 'readyState',
-                //     blockType: BlockType.REPORTER,
-                //     text: '接続状態',
-                //     arguments: {
-
-
-                //     }
-                // },
                 {
-                    opcode: 'set',
+                    opcode: 'connect',
                     blockType: BlockType.COMMAND,
-                    text: 'Key:[KEY]=[VALUE]',
+                    text: 'webSocketで接続[URL]',
                     arguments: {
-                        KEY: {
+                        URL: {
                             type: ArgumentType.STRING,
-                            defaultValue: "A"
+                            defaultValue: "ws://localhost:12345"
                         },
-                        VALUE: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: "0"
-                        }
+
                     }
                 },
+                {
+                    opcode: 'connectHttp',
+                    blockType: BlockType.COMMAND,
+                    text: 'HTTPで接続[URL]',
+                    arguments: {
+                        URL: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "http://localhost:8080/"
+                        },
+
+                    }
+                },
+                {
+                    opcode: 'readyState',
+                    blockType: BlockType.REPORTER,
+                    text: 'webSocketの接続状態',
+                    arguments: {
+
+
+                    }
+                },
+
                 {
                     opcode: 'morter',
                     blockType: BlockType.COMMAND,
@@ -93,17 +92,7 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
-                {
-                    opcode: 'get',
-                    blockType: BlockType.REPORTER,
-                    text: 'Key:[KEY]',
-                    arguments: {
-                        KEY: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "sensor"
-                        }
-                    }
-                },
+
                 {
                     opcode: 'keyGet',
                     blockType: BlockType.BOOLEAN,
@@ -116,58 +105,175 @@ class Scratch3NewBlocks {
                     }
                 },
                 {
-                    opcode: 'hat',
-                    blockType: BlockType.HAT,
-                    text: 'Key:[KEY]==[VALUE]',
+                    opcode: 'set',
+                    blockType: BlockType.COMMAND,
+                    text: 'Key:[KEY]=[VALUE]',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "A"
+                        },
+                        VALUE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        }
+                    }
+                },
+                {
+                    opcode: 'get',
+                    blockType: BlockType.REPORTER,
+                    text: 'Key:[KEY]',
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
                             defaultValue: "sensor"
-                        },
-                        VALUE: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "1"
                         }
                     }
-                }
+                },
+                // {
+                //     opcode: 'hat',
+                //     blockType: BlockType.HAT,
+                //     text: 'Key:[KEY]==[VALUE]',
+                //     arguments: {
+                //         KEY: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: "sensor"
+                //         },
+                //         VALUE: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: "1"
+                //         }
+                //     }
+                // }
             ],
             menus: {}
         };
     }
 
+    connectHttp(args) {
+        if (this.socket != null)
+            this.socket.close();
+
+        this.socket = null;
+        this.httpURL = args.URL;
+    }
+
+    connect(args) {
+        this.socket = new WebSocket(args.URL);
 
 
+        this.socket.onopen = () => {
+
+            this.socket.send('Scratchから接続しました');
+        };
+
+        this.socket.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+                console.log(event.data);
+
+                if ("queueCount" in data) {
+                    console.log("キューカウント" + data["queueCount"])
+                    this.queueCount = data["queueCount"];
+                }
+
+                if ("result" in data) {
+                    if (data.result === "True") data.result = true;
+                    if (data.result === "False") data.result = false;
+
+                    console.log(data.id, data.result);
+
+
+                    this.response[data.id] = data.result;
+                    console.log(this.response);
+
+                }
+            } catch (error) {
+                console.error("Error handling WebSocket message:", error, event.data);
+            }
+        };
+
+        // エラーが発生した時の処理
+        this.socket.onerror = (error) => {
+            console.error('WebSocket Error: ', error);
+        };
+
+        // サーバーとの接続が閉じられた時の処理
+        this.socket.onclose = () => {
+            console.log('Connection closed');
+        };
+
+
+    }
+
+    readyState(args) {
+        if (this.socket == null) {
+            return "-1";
+        }
+        return this.socket.readyState
+
+    }
 
     set(args) {
         const message = {
             type: "set",
             key: args.KEY,
-            value: args.VALUE
+            value: args.VALUE,
+            id: this.id++
+
         };
         console.log("送信", JSON.stringify(message))
 
-        return fetch('http://localhost:8080/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(message)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+        if (this.readyState(args) == 1) {
+            return new Promise(async (resolve) => {
+                console.log(args);
+
+
+                console.log(message);
+                console.log("this.virtualQueueCount", this.virtualQueueCount);
+                while (this.virtualQueueCount > 10) {
+                    console.log("送りすぎ", this.virtualQueueCount);
+                    await new Promise(r => setTimeout(r, 10)); // 0.1秒待機
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                return data.value; // 呼び出し元に返す
-            })
-            .catch(error => {
-                console.error('Fetch Error:', error);
-                throw error; // 呼び出し元でエラー処理可能に
+
+                this.virtualQueueCount += 1;
+                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    this.socket.send(JSON.stringify(message));
+                }
+
+                resolve();
             });
+        } else {
+
+
+            return fetch(this.httpURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(message)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    return data.value; // 呼び出し元に返す
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    throw error; // 呼び出し元でエラー処理可能に
+                });
+        }
+
     }
+
+
+
+
 
     morter(args) {
 
@@ -183,31 +289,57 @@ class Scratch3NewBlocks {
         const message = {
             type: "get",
             key: args.KEY,
-
+            id: this.id++
         };
-        console.log("送信", JSON.stringify(message))
+        if (this.readyState(args) == 1) {
+            console.log(message);
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                this.socket.send(JSON.stringify(message));
+            }
 
-        return fetch('http://localhost:8080/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(message)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+
+            let startTime = performance.now(); // 現在の時間を取得
+            while (performance.now() - startTime < 1000) { // 1秒間繰り返す
+
+                await new Promise(resolve => {
+                    requestAnimationFrame(resolve); // 次のフレームを待つ
+                });
+                if (message.id in this.response) {
+                    const value = this.response[message.id];
+                    delete this.response[message.id];
+                    console.log("value:", value);
+                    return value;
                 }
-                return response.json();
+            }
+
+            return "-1";
+        } else {
+
+
+            console.log("送信", JSON.stringify(message))
+
+            return fetch(this.httpURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(message)
             })
-            .then(data => {
-                console.log('Success:', data);
-                return data.value; // 呼び出し元に返す
-            })
-            .catch(error => {
-                console.error('Fetch Error:', error);
-                throw error; // 呼び出し元でエラー処理可能に
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    return data.value; // 呼び出し元に返す
+                })
+                .catch(error => {
+                    console.error('Fetch Error:', error);
+                    throw error; // 呼び出し元でエラー処理可能に
+                });
+        }
     }
 
     keyGet(args) {
