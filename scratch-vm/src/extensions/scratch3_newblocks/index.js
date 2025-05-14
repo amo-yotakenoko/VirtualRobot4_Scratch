@@ -130,6 +130,26 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
+                {
+                    opcode: 'teleport',
+                    blockType: BlockType.COMMAND,
+                    text: 'テレポート([X],[Y],[Z])',
+                    arguments: {
+
+                        X: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        },
+                        Y: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        },
+                        Z: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        }
+                    }
+                },
                 // {
                 //     opcode: 'hat',
                 //     blockType: BlockType.HAT,
@@ -224,9 +244,29 @@ class Scratch3NewBlocks {
         };
         console.log("送信", JSON.stringify(message))
 
-        if (this.readyState(args) == 1) {
+        return this.sendMessage(message)
+    }
+
+    async teleport(args) {
+        const message = {
+            type: "teleport",
+            x: parseInt(args.X, 10),
+            y: parseInt(args.Y, 10),
+            z: parseInt(args.Z, 10),
+            id: this.id++
+        };
+
+        const result = await this.sendMessage(message);
+
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1秒待つ
+
+        return result;
+    }
+
+    sendMessage(message) {
+        if (this.readyState() == 1) {
             return new Promise(async (resolve) => {
-                console.log(args);
+
 
 
                 console.log(message);
@@ -323,7 +363,8 @@ class Scratch3NewBlocks {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(message)
+                body: JSON.stringify(message),
+                cache: 'no-store'
             })
                 .then(response => {
                     if (!response.ok) {
