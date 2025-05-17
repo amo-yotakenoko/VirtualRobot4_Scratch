@@ -20,6 +20,16 @@ class Scratch3NewBlocks {
             }
 
         }, 30);
+
+        this.pressedKeys = new Set();
+
+        document.addEventListener('keydown', (event) => {
+            this.pressedKeys.add(event.key.toLowerCase());
+        });
+
+        document.addEventListener('keyup', (event) => {
+            this.pressedKeys.delete(event.key.toLowerCase());
+        });
     }
 
     getInfo() {
@@ -449,6 +459,12 @@ class Scratch3NewBlocks {
 
     keyGet(args) {
 
+        const key = args.KEY.toLowerCase();
+        const pressedKeys = this.pressedKeys.has(key);
+
+        if (pressedKeys === true) {
+            return true;
+        }
 
         return this.get({ ...args, KEY: "key." + args.KEY })
     }
