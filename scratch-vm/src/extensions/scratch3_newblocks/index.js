@@ -150,6 +150,41 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
+
+                {
+                    opcode: 'VRgetFloat',
+                    blockType: BlockType.REPORTER,
+                    text: 'VRコントローラー[DEVICE]の[KEY]',
+                    arguments: {
+
+                        DEVICE: {
+                            type: ArgumentType.STRING,
+                            menu: 'deviceMenu'
+                        },
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            menu: 'keyMenuFloat'
+                        },
+                    }
+                },
+
+                {
+                    opcode: 'VRgetBool',
+                    blockType: BlockType.BOOLEAN,
+                    text: 'VRコントローラー[DEVICE]の[KEY]',
+                    arguments: {
+
+                        DEVICE: {
+                            type: ArgumentType.STRING,
+                            menu: 'deviceMenu'
+                        },
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            menu: 'keyMenuBool'
+                        },
+                    }
+                },
+
                 // {
                 //     opcode: 'hat',
                 //     blockType: BlockType.HAT,
@@ -166,7 +201,36 @@ class Scratch3NewBlocks {
                 //     }
                 // }
             ],
-            menus: {}
+            menus: {
+                deviceMenu: {
+                    acceptReporters: false,
+                    items: ['右', '左']
+                },
+                keyMenuFloat: {
+                    acceptReporters: false,
+                    items: ['Trigger', 'Grip']
+                },
+                keyMenuBool: {
+                    acceptReporters: false,
+                    items: ['GripButton',
+                        'MenuButton',
+                        'PrimaryButton',
+                        ' PrimaryTouch',
+                        'SecondaryButton',
+                        'SecondaryTouch',
+                        'TriggerButton',
+                        'TriggerTouch',
+                        ' Primary2DAxisClick',
+                        'Primary2DAxisTouch',
+                        'ThumbrestTouch',
+                        'DeviceIsTracked',
+                        'PointerIsTracked',
+                        'IsTracked'
+
+                    ]
+                }
+
+            }
         };
     }
 
@@ -387,6 +451,22 @@ class Scratch3NewBlocks {
 
 
         return this.get({ ...args, KEY: "key." + args.KEY })
+    }
+
+    VRgetFloat(args) {
+        if (args.DEVICE == "右")
+            args.DEVICE = "VRright";
+        if (args.DEVICE == "左")
+            args.DEVICE = "VRleft";
+        return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
+    }
+
+    VRgetBool(args) {
+        if (args.DEVICE == "右")
+            args.DEVICE = "VRright";
+        if (args.DEVICE == "左")
+            args.DEVICE = "VRleft";
+        return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
 
 
