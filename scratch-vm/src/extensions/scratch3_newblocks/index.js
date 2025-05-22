@@ -102,6 +102,21 @@ class Scratch3NewBlocks {
                         }
                     }
                 },
+                {
+                    opcode: 'intensity',
+                    blockType: BlockType.COMMAND,
+                    text: 'ライト[KEY]の明るさを[VALUE]にする',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "A"
+                        },
+                        VALUE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        }
+                    }
+                },
 
                 {
                     opcode: 'keyGet',
@@ -396,6 +411,11 @@ class Scratch3NewBlocks {
     servo(args) {
 
         return this.set({ ...args, KEY: args.KEY + ".angle" })
+    }
+
+    intensity(args) {
+
+        return this.set({ ...args, KEY: args.KEY + ".intensity" })
     }
 
 
