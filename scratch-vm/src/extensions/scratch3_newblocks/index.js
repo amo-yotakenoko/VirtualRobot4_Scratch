@@ -130,6 +130,17 @@ class Scratch3NewBlocks {
                     }
                 },
                 {
+                    opcode: 'distance',
+                    blockType: BlockType.REPORTER,
+                    text: '距離センサ[KEY]',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "distance"
+                        }
+                    }
+                },
+                {
                     opcode: 'set',
                     blockType: BlockType.COMMAND,
                     text: 'Key:[KEY]=[VALUE]',
@@ -286,14 +297,14 @@ class Scratch3NewBlocks {
                     this.queueCount = data["queueCount"];
                 }
 
-                if ("result" in data) {
-                    if (data.result === "True") data.result = true;
-                    if (data.result === "False") data.result = false;
+                if ("value" in data) {
+                    if (data.value === "True") data.value = true;
+                    if (data.value === "False") data.value = false;
 
-                    console.log(data.id, data.result);
+                    console.log(data.id, data.value);
 
 
-                    this.response[data.id] = data.result;
+                    this.response[data.id] = data.value;
                     console.log(this.response);
 
                 }
@@ -487,6 +498,18 @@ class Scratch3NewBlocks {
         }
 
         return this.get({ ...args, KEY: "key." + args.KEY })
+    }
+
+    distance(args) {
+
+        const key = args.KEY.toLowerCase();
+        const pressedKeys = this.pressedKeys.has(key);
+
+        if (pressedKeys === true) {
+            return true;
+        }
+
+        return this.get({ ...args, KEY: args.KEY + ".distance" })
     }
 
     VRgetFloat(args) {
