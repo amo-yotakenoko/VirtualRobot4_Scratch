@@ -220,6 +220,20 @@ class Scratch3NewBlocks {
                         },
                     }
                 },
+                {
+                    opcode: 'activeViewproperty',
+                    blockType: BlockType.COMMAND,
+                    text: '情報の表示を[ISACTIVE]にする',
+                    arguments: {
+
+                        ISACTIVE: {
+                            type: BlockType.BOOLEAN,
+
+                            menu: 'isActiveMenu'
+                        },
+
+                    }
+                },
 
                 // {
                 //     opcode: 'hat',
@@ -241,6 +255,10 @@ class Scratch3NewBlocks {
                 deviceMenu: {
                     acceptReporters: false,
                     items: ['右', '左']
+                },
+                isActiveMenu: {
+                    acceptReporters: false,
+                    items: ['表示', '非表示']
                 },
                 keyMenuFloat: {
                     acceptReporters: false,
@@ -527,6 +545,20 @@ class Scratch3NewBlocks {
             args.DEVICE = "VRleft";
         return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
+
+    activeViewproperty(args) {
+        const message = {
+            type: "set",
+            key: "activeViewproperty",
+            value: args.ISACTIVE === "表示" ? "1" : "0",
+            id: this.id++
+
+        };
+        console.log("送信", JSON.stringify(message))
+
+        return this.sendMessage(message)
+    }
+
 
 
 
