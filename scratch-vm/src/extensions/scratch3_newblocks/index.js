@@ -34,6 +34,7 @@ class Scratch3NewBlocks {
         document.addEventListener('keyup', (event) => {
             this.pressedKeys.delete(event.key.toLowerCase());
         });
+
     }
 
 
@@ -48,13 +49,19 @@ class Scratch3NewBlocks {
 
         return {
             id: 'newblocks',
-            name: 'New Blocks',
+            name: translation({
+
+                en: 'VirtualRobot4(by takenoko)'
+            }),
             blocks: [
 
                 {
                     opcode: 'connect',
                     blockType: BlockType.COMMAND,
-                    text: translation('connect'),
+                    text: translation({
+                        ja: 'webSocketで接続[URL]',
+                        en: 'Connect via WebSocket [URL]'
+                    }),
 
                     arguments: {
                         URL: {
@@ -67,7 +74,10 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'connectHttp',
                     blockType: BlockType.COMMAND,
-                    text: translation('connectHttp'),
+                    text: translation({
+                        ja: 'HTTPで接続[URL]',
+                        en: 'Connect via HTTP [URL]'
+                    }),
                     arguments: {
                         URL: {
                             type: ArgumentType.STRING,
@@ -79,7 +89,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'readyState',
                     blockType: BlockType.REPORTER,
-                    text: 'webSocketの接続状態',
+
+                    text: translation({
+                        ja: 'webSocketの接続状態',
+                        en: 'WebSocket connection state'
+                    }),
                     arguments: {
 
 
@@ -89,7 +103,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'morter',
                     blockType: BlockType.COMMAND,
-                    text: 'モーター[KEY]のパワーを[VALUE]にする',
+
+                    text: translation({
+                        ja: 'モーター[KEY]のパワーを[VALUE]にする',
+                        en: 'Set motor [KEY] power to [VALUE]'
+                    }),
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -104,7 +122,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'servo',
                     blockType: BlockType.COMMAND,
-                    text: 'サーボモーター[KEY]を[VALUE]°にする',
+
+                    text: translation({
+                        ja: 'サーボモーター[KEY]を[VALUE]°にする',
+                        en: 'Set servo [KEY] to [VALUE]°'
+                    }),
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -119,7 +141,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'intensity',
                     blockType: BlockType.COMMAND,
-                    text: 'ライト[KEY]の明るさを[VALUE]にする',
+
+                    text: translation({
+                        ja: 'ライト[KEY]の明るさを[VALUE]にする',
+                        en: 'Set light [KEY] brightness to [VALUE]'
+                    }),
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -135,7 +161,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'keyGet',
                     blockType: BlockType.BOOLEAN,
-                    text: '[KEY]キーが押された',
+
+                    text: translation({
+                        ja: '[KEY]キーが押された',
+                        en: 'Key [KEY] pressed?'
+                    }),
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -146,7 +176,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'distance',
                     blockType: BlockType.REPORTER,
-                    text: '距離センサ[KEY]',
+
+                    text: translation({
+                        ja: '距離センサ[KEY]',
+                        en: 'Distance sensor [KEY]'
+                    }),
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -158,6 +192,7 @@ class Scratch3NewBlocks {
                     opcode: 'set',
                     blockType: BlockType.COMMAND,
                     text: 'Key:[KEY]=[VALUE]',
+
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -183,7 +218,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'teleport',
                     blockType: BlockType.COMMAND,
-                    text: 'テレポート([X],[Y],[Z])',
+
+                    text: translation({
+                        ja: 'テレポート([X],[Y],[Z])',
+                        en: 'Teleport to ([X],[Y],[Z])'
+                    }),
                     arguments: {
 
                         X: {
@@ -204,7 +243,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'VRgetFloat',
                     blockType: BlockType.REPORTER,
-                    text: 'VRコントローラー[DEVICE]の[KEY]',
+
+                    text: translation({
+                        ja: 'VRコントローラー[DEVICE]の[KEY]',
+                        en: 'VR controller [DEVICE] [KEY] (float)'
+                    }),
                     arguments: {
 
                         DEVICE: {
@@ -221,7 +264,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'VRgetBool',
                     blockType: BlockType.BOOLEAN,
-                    text: 'VRコントローラー[DEVICE]の[KEY]',
+
+                    text: translation({
+                        ja: 'VRコントローラー[DEVICE]の[KEY]',
+                        en: 'VR controller [DEVICE] [KEY] (boolean)'
+                    }),
                     arguments: {
 
                         DEVICE: {
@@ -237,7 +284,11 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'activeViewproperty',
                     blockType: BlockType.COMMAND,
-                    text: '情報の表示を[ISACTIVE]にする',
+
+                    text: translation({
+                        ja: '情報の表示を[ISACTIVE]にする',
+                        en: 'Set info display to [ISACTIVE]'
+                    }),
                     arguments: {
 
                         ISACTIVE: {
@@ -268,36 +319,41 @@ class Scratch3NewBlocks {
             menus: {
                 deviceMenu: {
                     acceptReporters: false,
-                    items: ['右', '左']
+                    items: [
+                        { text: translation({ ja: '右', en: 'Right' }), value: 'VRright' },
+                        { text: translation({ ja: '左', en: 'Left' }), value: 'VRleft' }
+                    ]
                 },
                 isActiveMenu: {
                     acceptReporters: false,
-                    items: ['表示', '非表示']
+                    items: [
+                        { text: translation({ ja: '表示', en: 'Show' }), value: '1' },
+                        { text: translation({ ja: '非表示', en: 'Hide' }), value: '0' }
+                    ]
                 },
                 keyMenuFloat: {
                     acceptReporters: false,
-                    items: ['Trigger', 'Grip']
+                    items: [translation({ ja: 'トリガー(Trigger)', en: 'Trigger' }), translation({ ja: 'グリップ(Grip)', en: 'Grip' })]
                 },
                 keyMenuBool: {
                     acceptReporters: false,
-                    items: ['GripButton',
-                        'MenuButton',
-                        'PrimaryButton',
-                        ' PrimaryTouch',
-                        'SecondaryButton',
-                        'SecondaryTouch',
-                        'TriggerButton',
-                        'TriggerTouch',
-                        ' Primary2DAxisClick',
-                        'Primary2DAxisTouch',
-                        'ThumbrestTouch',
-                        'DeviceIsTracked',
-                        'PointerIsTracked',
-                        'IsTracked'
-
+                    items: [
+                        { text: translation({ ja: 'グリップボタン (Grip Button)', en: 'Grip Button' }), value: 'gripButton' },
+                        { text: translation({ ja: 'メニューボタン (Menu Button)', en: 'Menu Button' }), value: 'menuButton' },
+                        { text: translation({ ja: 'プライマリーボタン (Primary Button)', en: 'Primary Button' }), value: 'primaryButton' },
+                        { text: translation({ ja: 'プライマリートッチ (Primary Touch)', en: 'Primary Touch' }), value: 'primaryTouch' },
+                        { text: translation({ ja: 'セカンダリーボタン (Secondary Button)', en: 'Secondary Button' }), value: 'secondaryButton' },
+                        { text: translation({ ja: 'セカンダリートッチ (Secondary Touch)', en: 'Secondary Touch' }), value: 'secondaryTouch' },
+                        { text: translation({ ja: 'トリガーボタン (Trigger Button)', en: 'Trigger Button' }), value: 'triggerButton' },
+                        { text: translation({ ja: 'トリガートッチ (Trigger Touch)', en: 'Trigger Touch' }), value: 'triggerTouch' },
+                        { text: translation({ ja: 'プライマリ2D軸クリック (Primary 2D Axis Click)', en: 'Primary 2D Axis Click' }), value: 'primary2DAxisClick' },
+                        { text: translation({ ja: 'プライマリ2D軸トッチ (Primary 2D Axis Touch)', en: 'Primary 2D Axis Touch' }), value: 'primary2DAxisTouch' },
+                        { text: translation({ ja: 'サムレストトッチ (Thumbrest Touch)', en: 'Thumbrest Touch' }), value: 'thumbrestTouch' },
+                        { text: translation({ ja: 'デバイス追跡中 (Device Is Tracked)', en: 'Device Is Tracked' }), value: 'deviceIsTracked' },
+                        { text: translation({ ja: 'ポインター追跡中 (Pointer Is Tracked)', en: 'Pointer Is Tracked' }), value: 'pointerIsTracked' },
+                        { text: translation({ ja: '追跡中 (Is Tracked)', en: 'Is Tracked' }), value: 'isTracked' },
                     ]
                 }
-
             }
 
         };
@@ -546,18 +602,18 @@ class Scratch3NewBlocks {
     }
 
     VRgetFloat(args) {
-        if (args.DEVICE == "right")
-            args.DEVICE = "VRright";
-        if (args.DEVICE == "left")
-            args.DEVICE = "VRleft";
+        // if (args.DEVICE == "right")
+        //     args.DEVICE = "VRright";
+        // if (args.DEVICE == "left")
+        //     args.DEVICE = "VRleft";
         return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
 
     VRgetBool(args) {
-        if (args.DEVICE == "right")
-            args.DEVICE = "VRright";
-        if (args.DEVICE == "left")
-            args.DEVICE = "VRleft";
+        // if (args.DEVICE == "right")
+        //     args.DEVICE = "VRright";
+        // if (args.DEVICE == "left")
+        //     args.DEVICE = "VRleft";
         return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
 
@@ -565,7 +621,7 @@ class Scratch3NewBlocks {
         const message = {
             type: "set",
             key: "activeViewproperty",
-            value: args.ISACTIVE === "true" ? "1" : "0",
+            value: args.ISACTIVE,
             id: this.id++
 
         };

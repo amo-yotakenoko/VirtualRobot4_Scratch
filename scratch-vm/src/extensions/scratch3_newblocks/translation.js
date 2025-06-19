@@ -1,5 +1,7 @@
 const formatMessage = require('format-message');
 
+
+
 const messages = {
 	'categoryName': {
 		ja: '新しいブロック',
@@ -149,11 +151,12 @@ const messages = {
 	}
 };
 
-function translation(id) {
-	const locale = formatMessage.setup().locale
-	const item = messages[id];
-	if (!item) return id;
-	return item[locale] ?? item['en'] ?? id;
+function translation(text_list) {
+	let locale = formatMessage.setup().locale
+	console.log(locale)
+	if (locale === "ja-Hira")
+		locale = "ja"
+	return text_list[locale] ?? text_list['en'];
 }
 
 module.exports = translation;
