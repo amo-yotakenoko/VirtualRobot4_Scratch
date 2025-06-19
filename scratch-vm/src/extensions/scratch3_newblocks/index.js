@@ -3,6 +3,10 @@ const BlockType = require('../../extension-support/block-type');
 const Cast = require('../../util/cast');
 const log = require('../../util/log');
 const virtualrobot_send = require('../../util/virtualrobot_send');
+const translation = require('./translation.js');
+
+const formatMessage = require('format-message');
+
 class Scratch3NewBlocks {
     constructor(runtime) {
         this.runtime = runtime;
@@ -32,7 +36,16 @@ class Scratch3NewBlocks {
         });
     }
 
+
+
+
     getInfo() {
+
+
+
+
+
+
         return {
             id: 'newblocks',
             name: 'New Blocks',
@@ -41,7 +54,8 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'connect',
                     blockType: BlockType.COMMAND,
-                    text: 'webSocketで接続[URL]',
+                    text: translation('connect'),
+
                     arguments: {
                         URL: {
                             type: ArgumentType.STRING,
@@ -53,7 +67,7 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'connectHttp',
                     blockType: BlockType.COMMAND,
-                    text: 'HTTPで接続[URL]',
+                    text: translation('connectHttp'),
                     arguments: {
                         URL: {
                             type: ArgumentType.STRING,
@@ -285,6 +299,7 @@ class Scratch3NewBlocks {
                 }
 
             }
+
         };
     }
 
@@ -531,17 +546,17 @@ class Scratch3NewBlocks {
     }
 
     VRgetFloat(args) {
-        if (args.DEVICE == "右")
+        if (args.DEVICE == "right")
             args.DEVICE = "VRright";
-        if (args.DEVICE == "左")
+        if (args.DEVICE == "left")
             args.DEVICE = "VRleft";
         return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
 
     VRgetBool(args) {
-        if (args.DEVICE == "右")
+        if (args.DEVICE == "right")
             args.DEVICE = "VRright";
-        if (args.DEVICE == "左")
+        if (args.DEVICE == "left")
             args.DEVICE = "VRleft";
         return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
@@ -550,7 +565,7 @@ class Scratch3NewBlocks {
         const message = {
             type: "set",
             key: "activeViewproperty",
-            value: args.ISACTIVE === "表示" ? "1" : "0",
+            value: args.ISACTIVE === "true" ? "1" : "0",
             id: this.id++
 
         };
