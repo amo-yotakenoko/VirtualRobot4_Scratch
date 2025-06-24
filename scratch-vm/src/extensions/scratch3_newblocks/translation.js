@@ -153,7 +153,7 @@ const messages = {
 
 function translation(text_list) {
 	let locale = formatMessage.setup().locale
-	console.log(locale)
+
 	if (locale === "ja-Hira")
 		locale = "ja"
 	return text_list[locale] ?? text_list['en'];

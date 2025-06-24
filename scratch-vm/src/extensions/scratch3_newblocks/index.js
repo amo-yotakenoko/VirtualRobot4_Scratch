@@ -35,8 +35,23 @@ class Scratch3NewBlocks {
             this.pressedKeys.delete(event.key.toLowerCase());
         });
 
-    }
 
+        this.devicesList = [{ text: "読み込み中...", value: "loading" }];
+
+
+    }
+    updateDevicesList(args) {
+        this.get({ KEY: "info" })
+            .then(robotInfo => {
+                const devices = JSON.parse(robotInfo).devices;
+                this.devicesList = [...new Set(devices.map(d => d.name))]
+                    .map(name => ({ text: name, value: name }));
+                console.log("デバイスリストを再読み込み:", this.devicesList);
+            })
+            .catch(err => {
+                console.error("再読み込み失敗:", err);
+            });
+    }
 
 
 
@@ -54,7 +69,14 @@ class Scratch3NewBlocks {
                 en: 'VirtualRobot4(by takenoko)'
             }),
             blocks: [
-
+                {
+                    opcode: 'updateDevicesList',
+                    blockType: BlockType.COMMAND,
+                    text: translation({
+                        ja: 'デバイスメニューを再読み込み',
+                        en: 'Refresh device menu'
+                    })
+                },
                 {
                     opcode: 'connect',
                     blockType: BlockType.COMMAND,
@@ -99,6 +121,27 @@ class Scratch3NewBlocks {
 
                     }
                 },
+
+                {
+                    opcode: 'morter',
+                    blockType: BlockType.COMMAND,
+
+                    text: translation({
+                        ja: 'モーター[KEY]のパワーを[VALUE]にする',
+                        en: 'Set motor [KEY] power to [VALUE]'
+                    }),
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            menu: 'moterMenu'
+                        },
+                        VALUE: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: "0"
+                        }
+                    }
+                },
+
 
                 {
                     opcode: 'morter',
@@ -253,6 +296,7 @@ class Scratch3NewBlocks {
                         DEVICE: {
                             type: ArgumentType.STRING,
                             menu: 'deviceMenu'
+
                         },
                         KEY: {
                             type: ArgumentType.STRING,
@@ -317,8 +361,17 @@ class Scratch3NewBlocks {
                 // }
             ],
             menus: {
+                moterMenu: {
+
+                    items: () => {
+
+                        return [{ text: '未取得', value: 'none' }];
+
+                    }
+                },
+
                 deviceMenu: {
-                    acceptReporters: false,
+                    acceptReporters: true,
                     items: [
                         { text: translation({ ja: '右', en: 'Right' }), value: 'VRright' },
                         { text: translation({ ja: '左', en: 'Left' }), value: 'VRleft' }
@@ -328,15 +381,17 @@ class Scratch3NewBlocks {
                     acceptReporters: false,
                     items: [
                         { text: translation({ ja: '表示', en: 'Show' }), value: '1' },
-                        { text: translation({ ja: '非表示', en: 'Hide' }), value: '0' }
+                        { text: translation({ ja: '非表示', en: 'Hide' }), value: '0' },
+
+
                     ]
                 },
                 keyMenuFloat: {
-                    acceptReporters: false,
+                    acceptReporters: true,
                     items: [translation({ ja: 'トリガー(Trigger)', en: 'Trigger' }), translation({ ja: 'グリップ(Grip)', en: 'Grip' })]
                 },
                 keyMenuBool: {
-                    acceptReporters: false,
+                    acceptReporters: true,
                     items: [
                         { text: translation({ ja: 'グリップボタン (Grip Button)', en: 'Grip Button' }), value: 'gripButton' },
                         { text: translation({ ja: 'メニューボタン (Menu Button)', en: 'Menu Button' }), value: 'menuButton' },
@@ -358,6 +413,8 @@ class Scratch3NewBlocks {
 
         };
     }
+
+
 
     connectHttp(args) {
         if (this.socket != null)
