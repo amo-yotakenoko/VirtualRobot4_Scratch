@@ -48,21 +48,22 @@ class Scratch3NewBlocks {
 
 
     }
-    updateDevicesList(args) {
-        this.get({ KEY: "info" })
-            .then(robotInfo => {
-                const devices = JSON.parse(robotInfo).devices;
-                this.rawDevicesList = devices;
-                this.devicesList = [...new Set(devices.map(d => d.name))]
-                    .map(name => ([name, name]));
-                console.log("デバイスリストを再読み込み:", this.devicesList);
-                this.runtime.requestBlocksUpdate();
-            })
-            .catch(err => {
-                this.devicesList = [['未取得', 'none']];
-                console.error("再読み込み失敗:", err);
-                this.runtime.requestBlocksUpdate();
-            });
+    async updateDevicesList(args) {
+        try {
+            const robotInfo = await this.get({ KEY: "info" });
+            const devices = JSON.parse(robotInfo).devices;
+            this.rawDevicesList = devices;
+            this.devicesList = [...new Set(devices.map(d => d.name))]
+                .map(name => ([name, name]));
+            console.log("デバイスリストを再読み込み:", this.devicesList);
+            this.runtime.requestBlocksUpdate();
+            return devices.length;
+        } catch (err) {
+            this.devicesList = [['未取得', 'none']];
+            console.error("再読み込み失敗:", err);
+            this.runtime.requestBlocksUpdate();
+            return 0;
+        }
     }
 
 
