@@ -5,6 +5,12 @@ const log = require('../../util/log');
 const virtualrobot_send = require('../../util/virtualrobot_send');
 const translation = require('./translation.js');
 
+const DEFAULT_MOTOR_OPTIONS = [
+    ['A', 'A'],
+    ['B', 'B'],
+    ['C', 'C']
+];
+
 const formatMessage = require('format-message');
 
 class Scratch3NewBlocks {
@@ -36,7 +42,8 @@ class Scratch3NewBlocks {
         });
 
 
-        this.devicesList = [{ text: "読み込み中...", value: "loading" }];
+        this.devicesList = [['読み込みに失敗', '_']];
+        this.updateDevicesList();
 
 
     }
@@ -45,10 +52,12 @@ class Scratch3NewBlocks {
             .then(robotInfo => {
                 const devices = JSON.parse(robotInfo).devices;
                 this.devicesList = [...new Set(devices.map(d => d.name))]
-                    .map(name => ({ text: name, value: name }));
+                    .map(name => ([name, name]));
                 console.log("デバイスリストを再読み込み:", this.devicesList);
+                this.runtime.requestBlocksUpdate();
             })
             .catch(err => {
+                this.devicesList = [['読み込みに失敗', '_']];
                 console.error("再読み込み失敗:", err);
             });
     }
@@ -143,25 +152,25 @@ class Scratch3NewBlocks {
                 },
 
 
-                {
-                    opcode: 'morter',
-                    blockType: BlockType.COMMAND,
-
-                    text: translation({
-                        ja: 'モーター[KEY]のパワーを[VALUE]にする',
-                        en: 'Set motor [KEY] power to [VALUE]'
-                    }),
-                    arguments: {
-                        KEY: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "A"
-                        },
-                        VALUE: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: "0"
-                        }
-                    }
-                },
+                // {
+                //     opcode: 'morter',
+                //     blockType: BlockType.COMMAND,
+                //
+                //     text: translation({
+                //         ja: 'モーター[KEY]のパワーを[VALUE]にする',
+                //         en: 'Set motor [KEY] power to [VALUE]'
+                //     }),
+                //     arguments: {
+                //         KEY: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: "A"
+                //         },
+                //         VALUE: {
+                //             type: ArgumentType.NUMBER,
+                //             defaultValue: "0"
+                //         }
+                //     }
+                // },
                 {
                     opcode: 'servo',
                     blockType: BlockType.COMMAND,
@@ -362,12 +371,7 @@ class Scratch3NewBlocks {
             ],
             menus: {
                 moterMenu: {
-
-                    items: () => {
-
-                        return [{ text: '未取得', value: 'none' }];
-
-                    }
+                    items: () => this.getMotorMenu()
                 },
 
                 deviceMenu: {
@@ -689,6 +693,16 @@ class Scratch3NewBlocks {
 
 
 
+
+    getMotorMenu() {
+        console.log("getMotorMenu called. devicesList:", this.devicesList);
+        if (this.devicesList && this.devicesList.length > 0 && this.devicesList[0][0] !== "読み込み中...") {
+            console.log("Returning devicesList:", this.devicesList);
+            return this.devicesList;
+        }
+        console.log("Returning DEFAULT_MOTOR_OPTIONS:", DEFAULT_MOTOR_OPTIONS);
+        return DEFAULT_MOTOR_OPTIONS;
+    }
 
     hat(args) {
         return this.sig[args.KEY] == args.VALUE;
