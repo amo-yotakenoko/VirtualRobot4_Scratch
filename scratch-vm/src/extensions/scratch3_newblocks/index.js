@@ -42,7 +42,8 @@ class Scratch3NewBlocks {
         });
 
 
-        this.devicesList = [['読み込みに失敗', '_']];
+        this.devicesList = [['読み込み中...', 'loading']];
+        this.rawDevicesList = [];
         this.updateDevicesList();
 
 
@@ -51,14 +52,16 @@ class Scratch3NewBlocks {
         this.get({ KEY: "info" })
             .then(robotInfo => {
                 const devices = JSON.parse(robotInfo).devices;
+                this.rawDevicesList = devices;
                 this.devicesList = [...new Set(devices.map(d => d.name))]
                     .map(name => ([name, name]));
                 console.log("デバイスリストを再読み込み:", this.devicesList);
                 this.runtime.requestBlocksUpdate();
             })
             .catch(err => {
-                this.devicesList = [['読み込みに失敗', '_']];
+                this.devicesList = [['未取得', 'none']];
                 console.error("再読み込み失敗:", err);
+                this.runtime.requestBlocksUpdate();
             });
     }
 
@@ -182,7 +185,7 @@ class Scratch3NewBlocks {
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
-                            defaultValue: "A"
+                            menu: 'servoMenu'
                         },
                         VALUE: {
                             type: ArgumentType.NUMBER,
@@ -201,7 +204,7 @@ class Scratch3NewBlocks {
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
-                            defaultValue: "A"
+                            menu: 'intensityMenu'
                         },
                         VALUE: {
                             type: ArgumentType.NUMBER,
@@ -236,7 +239,7 @@ class Scratch3NewBlocks {
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
-                            defaultValue: "distance"
+                            menu: 'distanceMenu'
                         }
                     }
                 },
@@ -371,8 +374,21 @@ class Scratch3NewBlocks {
             ],
             menus: {
                 moterMenu: {
-                    items: () => this.getMotorMenu()
+                    items: () => this.getDeviceMenu('motor')
                 },
+
+                servoMenu: {
+                    items: () => this.getDeviceMenu('servo')
+                },
+
+                intensityMenu: {
+                    items: () => this.getDeviceMenu('light')
+                },
+
+                distanceMenu: {
+                    items: () => this.getDeviceMenu('distance')
+                },
+
 
                 deviceMenu: {
                     acceptReporters: true,
@@ -694,13 +710,14 @@ class Scratch3NewBlocks {
 
 
 
-    getMotorMenu() {
-        console.log("getMotorMenu called. devicesList:", this.devicesList);
-        if (this.devicesList && this.devicesList.length > 0 && this.devicesList[0][0] !== "読み込み中...") {
-            console.log("Returning devicesList:", this.devicesList);
-            return this.devicesList;
+    getDeviceMenu(deviceType) {
+        console.log("getDeviceMenu called. rawDevicesList:", this.rawDevicesList);
+        if (this.rawDevicesList && this.rawDevicesList.length > 0) {
+            const filteredDevices = this.rawDevicesList.filter(device => device.type === deviceType);
+            if (filteredDevices.length > 0) {
+                return filteredDevices.map(device => ([device.name, device.name]));
+            }
         }
-        console.log("Returning DEFAULT_MOTOR_OPTIONS:", DEFAULT_MOTOR_OPTIONS);
         return DEFAULT_MOTOR_OPTIONS;
     }
 
