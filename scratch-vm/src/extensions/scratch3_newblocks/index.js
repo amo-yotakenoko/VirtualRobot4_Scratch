@@ -387,7 +387,7 @@ class Scratch3NewBlocks {
                 },
 
                 distanceMenu: {
-                    items: () => this.getDeviceMenu('distance')
+                    items: () => this.getDeviceMenu('distanceSensor')
                 },
 
 
