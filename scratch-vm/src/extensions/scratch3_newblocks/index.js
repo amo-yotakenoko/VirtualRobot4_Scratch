@@ -6,13 +6,14 @@ const virtualrobot_send = require('../../util/virtualrobot_send');
 const translation = require('./translation.js');
 
 const DEFAULT_MOTOR_OPTIONS = [
-    ['?', '?'],
+    ['未取得', 'A'],
 ];
 
 const formatMessage = require('format-message');
 
 class Scratch3NewBlocks {
     constructor(runtime) {
+        console.log("Scratch3NewBlocks.constructor called");
         this.runtime = runtime;
 
         this.socket = null;
@@ -47,26 +48,29 @@ class Scratch3NewBlocks {
 
     }
     async updateDevicesList(args) {
+        console.log("Scratch3NewBlocks.updateDevicesList called");
+        this.devicesList = [];
+        let devices = []; // Initialize devices to an empty array
         try {
             const robotInfo = await this.vr_get_key({ KEY: "info" });
-            const devices = JSON.parse(robotInfo).devices;
+            devices = JSON.parse(robotInfo).devices;
             this.rawDevicesList = devices;
             this.devicesList = [...new Set(devices.map(d => d.name))]
                 .map(name => ([name, name]));
             console.log("デバイスリストを再読み込み:", this.devicesList);
-            this.runtime.requestBlocksUpdate();
-            return devices.length;
         } catch (err) {
-            this.devicesList = [['未取得', 'none']];
             console.error("再読み込み失敗:", err);
-            this.runtime.requestBlocksUpdate();
-            return 0;
         }
+
+        // this.runtime.requestBlocksUpdate();
+        return devices.length;
+
     }
 
 
 
     getInfo() {
+        console.log("Scratch3NewBlocks.getInfo called");
 
 
 
@@ -245,7 +249,10 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'vr_set_key',
                     blockType: BlockType.COMMAND,
-                    text: 'Key:[KEY]=[VALUE]',
+                    text: translation({
+                        ja: 'VRキー[KEY]を[VALUE]にする',
+                        en: 'Set VR Key [KEY] to [VALUE]'
+                    }),
 
                     arguments: {
                         KEY: {
@@ -261,7 +268,10 @@ class Scratch3NewBlocks {
                 {
                     opcode: 'vr_get_key',
                     blockType: BlockType.REPORTER,
-                    text: 'Key:[KEY]',
+                    text: translation({
+                        ja: 'VRキー[KEY]',
+                        en: 'VR Key [KEY]'
+                    }),
                     arguments: {
                         KEY: {
                             type: ArgumentType.STRING,
@@ -355,21 +365,21 @@ class Scratch3NewBlocks {
                     }
                 },
 
-                // {
-                //     opcode: 'vr_hat',
-                //     blockType: BlockType.HAT,
-                //     text: 'Key:[KEY]==[VALUE]',
-                //     arguments: {
-                //         KEY: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: "sensor"
-                //         },
-                //         VALUE: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: "1"
-                //         }
-                //     }
-                // }
+                {
+                    opcode: 'vr_hat',
+                    blockType: BlockType.HAT,
+                    text: 'Key:[KEY]==[VALUE]',
+                    arguments: {
+                        KEY: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "sensor"
+                        },
+                        VALUE: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "1"
+                        }
+                    }
+                }
             ],
             menus: {
                 moterMenu: {
@@ -436,6 +446,7 @@ class Scratch3NewBlocks {
 
 
     connectHttp(args) {
+        console.log("Scratch3NewBlocks.connectHttp called");
         if (this.socket != null)
             this.socket.close();
 
@@ -444,6 +455,7 @@ class Scratch3NewBlocks {
     }
 
     connect(args) {
+        console.log("Scratch3NewBlocks.connect called");
         this.socket = new WebSocket(args.URL);
 
 
@@ -492,6 +504,7 @@ class Scratch3NewBlocks {
     }
 
     readyState(args) {
+        console.log("Scratch3NewBlocks.readyState called");
         if (this.socket == null) {
             return "-1";
         }
@@ -500,6 +513,7 @@ class Scratch3NewBlocks {
     }
 
     vr_set_key(args) {
+        console.log("Scratch3NewBlocks.vr_set_key called");
         const message = {
             type: "set",
             key: args.KEY,
@@ -513,6 +527,7 @@ class Scratch3NewBlocks {
     }
 
     async teleport(args) {
+        console.log("Scratch3NewBlocks.teleport called");
         const message = {
             type: "teleport",
             x: parseInt(args.X, 10),
@@ -529,6 +544,7 @@ class Scratch3NewBlocks {
     }
 
     sendMessage(message) {
+        console.log("Scratch3NewBlocks.sendMessage called");
         if (this.readyState() == 1) {
             return new Promise(async (resolve) => {
 
@@ -581,21 +597,26 @@ class Scratch3NewBlocks {
 
 
     morter(args) {
+        console.log("Scratch3NewBlocks.morter called");
 
         return this.vr_set_key({ ...args, KEY: args.KEY + ".power" })
     }
     servo(args) {
+        console.log("Scratch3NewBlocks.servo called");
 
         return this.vr_set_key({ ...args, KEY: args.KEY + ".angle" })
     }
 
     intensity(args) {
+        console.log("Scratch3NewBlocks.intensity called");
 
         return this.vr_set_key({ ...args, KEY: args.KEY + ".intensity" })
     }
 
 
     async vr_get_key(args) {
+
+        console.log("Scratch3NewBlocks.vr_get_key called", args);
         const message = {
             type: "get",
             key: args.KEY,
@@ -628,6 +649,7 @@ class Scratch3NewBlocks {
 
             console.log("送信", JSON.stringify(message))
 
+
             return fetch(this.httpURL, {
                 method: 'POST',
                 headers: {
@@ -650,10 +672,13 @@ class Scratch3NewBlocks {
                     console.error('Fetch Error:', error);
                     throw error; // 呼び出し元でエラー処理可能に
                 });
+
+            return "dummy_value";
         }
     }
 
     keyGet(args) {
+        console.log("Scratch3NewBlocks.keyGet called");
 
         const key = args.KEY.toLowerCase();
         const pressedKeys = this.pressedKeys.has(key);
@@ -666,6 +691,7 @@ class Scratch3NewBlocks {
     }
 
     distance(args) {
+        console.log("Scratch3NewBlocks.distance called");
 
         const key = args.KEY.toLowerCase();
         const pressedKeys = this.pressedKeys.has(key);
@@ -678,6 +704,7 @@ class Scratch3NewBlocks {
     }
 
     VRgetFloat(args) {
+        console.log("Scratch3NewBlocks.VRgetFloat called");
         // if (args.DEVICE == "right")
         //     args.DEVICE = "VRright";
         // if (args.DEVICE == "left")
@@ -686,6 +713,7 @@ class Scratch3NewBlocks {
     }
 
     VRgetBool(args) {
+        console.log("Scratch3NewBlocks.VRgetBool called");
         // if (args.DEVICE == "right")
         //     args.DEVICE = "VRright";
         // if (args.DEVICE == "left")
@@ -694,6 +722,7 @@ class Scratch3NewBlocks {
     }
 
     activeViewproperty(args) {
+        console.log("Scratch3NewBlocks.activeViewproperty called");
         const message = {
             type: "set",
             key: "activeViewproperty",
@@ -710,19 +739,21 @@ class Scratch3NewBlocks {
 
 
     getDeviceMenu(deviceType) {
+        console.log("Scratch3NewBlocks.getDeviceMenu called");
         console.log("getDeviceMenu called. rawDevicesList:", this.rawDevicesList);
         if (this.rawDevicesList && this.rawDevicesList.length > 0) {
             const filteredDevices = this.rawDevicesList.filter(device => device.type === deviceType);
             if (filteredDevices.length > 0) {
-                return [...DEFAULT_MOTOR_OPTIONS, ...filteredDevices.map(device => ([device.name, device.name]))];
+                return filteredDevices.map(device => ([device.name, device.name]));
             }
         }
         return DEFAULT_MOTOR_OPTIONS;
     }
 
-    vr_hat(args) {
-        return this.sig[args.KEY] == args.VALUE;
-    }
+    // vr_hat(args) {
+    //     console.log("Scratch3NewBlocks.vr_hat called");
+    //     return this.sig[args.KEY] == args.VALUE;
+    // }
 }
 
 
