@@ -6,9 +6,7 @@ const virtualrobot_send = require('../../util/virtualrobot_send');
 const translation = require('./translation.js');
 
 const DEFAULT_MOTOR_OPTIONS = [
-    ['A', 'A'],
-    ['B', 'B'],
-    ['C', 'C']
+    ['?', '?'],
 ];
 
 const formatMessage = require('format-message');
@@ -50,7 +48,7 @@ class Scratch3NewBlocks {
     }
     async updateDevicesList(args) {
         try {
-            const robotInfo = await this.get({ KEY: "info" });
+            const robotInfo = await this.vr_get_key({ KEY: "info" });
             const devices = JSON.parse(robotInfo).devices;
             this.rawDevicesList = devices;
             this.devicesList = [...new Set(devices.map(d => d.name))]
@@ -245,7 +243,7 @@ class Scratch3NewBlocks {
                     }
                 },
                 {
-                    opcode: 'set',
+                    opcode: 'vr_set_key',
                     blockType: BlockType.COMMAND,
                     text: 'Key:[KEY]=[VALUE]',
 
@@ -261,7 +259,7 @@ class Scratch3NewBlocks {
                     }
                 },
                 {
-                    opcode: 'get',
+                    opcode: 'vr_get_key',
                     blockType: BlockType.REPORTER,
                     text: 'Key:[KEY]',
                     arguments: {
@@ -358,7 +356,7 @@ class Scratch3NewBlocks {
                 },
 
                 // {
-                //     opcode: 'hat',
+                //     opcode: 'vr_hat',
                 //     blockType: BlockType.HAT,
                 //     text: 'Key:[KEY]==[VALUE]',
                 //     arguments: {
@@ -501,7 +499,7 @@ class Scratch3NewBlocks {
 
     }
 
-    set(args) {
+    vr_set_key(args) {
         const message = {
             type: "set",
             key: args.KEY,
@@ -584,20 +582,20 @@ class Scratch3NewBlocks {
 
     morter(args) {
 
-        return this.set({ ...args, KEY: args.KEY + ".power" })
+        return this.vr_set_key({ ...args, KEY: args.KEY + ".power" })
     }
     servo(args) {
 
-        return this.set({ ...args, KEY: args.KEY + ".angle" })
+        return this.vr_set_key({ ...args, KEY: args.KEY + ".angle" })
     }
 
     intensity(args) {
 
-        return this.set({ ...args, KEY: args.KEY + ".intensity" })
+        return this.vr_set_key({ ...args, KEY: args.KEY + ".intensity" })
     }
 
 
-    async get(args) {
+    async vr_get_key(args) {
         const message = {
             type: "get",
             key: args.KEY,
@@ -664,7 +662,7 @@ class Scratch3NewBlocks {
             return true;
         }
 
-        return this.get({ ...args, KEY: "key." + args.KEY })
+        return this.vr_get_key({ ...args, KEY: "key." + args.KEY })
     }
 
     distance(args) {
@@ -676,7 +674,7 @@ class Scratch3NewBlocks {
             return true;
         }
 
-        return this.get({ ...args, KEY: args.KEY + ".distance" })
+        return this.vr_get_key({ ...args, KEY: args.KEY + ".distance" })
     }
 
     VRgetFloat(args) {
@@ -684,7 +682,7 @@ class Scratch3NewBlocks {
         //     args.DEVICE = "VRright";
         // if (args.DEVICE == "left")
         //     args.DEVICE = "VRleft";
-        return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
+        return this.vr_get_key({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
 
     VRgetBool(args) {
@@ -692,7 +690,7 @@ class Scratch3NewBlocks {
         //     args.DEVICE = "VRright";
         // if (args.DEVICE == "left")
         //     args.DEVICE = "VRleft";
-        return this.get({ ...args, KEY: args.DEVICE + "." + args.KEY })
+        return this.vr_get_key({ ...args, KEY: args.DEVICE + "." + args.KEY })
     }
 
     activeViewproperty(args) {
@@ -716,13 +714,13 @@ class Scratch3NewBlocks {
         if (this.rawDevicesList && this.rawDevicesList.length > 0) {
             const filteredDevices = this.rawDevicesList.filter(device => device.type === deviceType);
             if (filteredDevices.length > 0) {
-                return filteredDevices.map(device => ([device.name, device.name]));
+                return [...DEFAULT_MOTOR_OPTIONS, ...filteredDevices.map(device => ([device.name, device.name]))];
             }
         }
         return DEFAULT_MOTOR_OPTIONS;
     }
 
-    hat(args) {
+    vr_hat(args) {
         return this.sig[args.KEY] == args.VALUE;
     }
 }
