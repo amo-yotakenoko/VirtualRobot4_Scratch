@@ -365,21 +365,21 @@ class Scratch3NewBlocks {
                     }
                 },
 
-                {
-                    opcode: 'vr_hat',
-                    blockType: BlockType.HAT,
-                    text: 'Key:[KEY]==[VALUE]',
-                    arguments: {
-                        KEY: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "sensor"
-                        },
-                        VALUE: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "1"
-                        }
-                    }
-                }
+                // {
+                //     opcode: 'vr_hat',
+                //     blockType: BlockType.HAT,
+                //     text: 'Key:[KEY]==[VALUE]',
+                //     arguments: {
+                //         KEY: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: "sensor"
+                //         },
+                //         VALUE: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: "1"
+                //         }
+                //     }
+                // }
             ],
             menus: {
                 moterMenu: {
