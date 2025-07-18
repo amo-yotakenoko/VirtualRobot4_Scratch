@@ -531,7 +531,7 @@ class Scratch3NewBlocks {
 
     setRobotId(args) {
         this.robotId = args.ID;
-        updateDevicesList();
+        this.updateDevicesList();
     }
 
     vr_set_key(args) {
