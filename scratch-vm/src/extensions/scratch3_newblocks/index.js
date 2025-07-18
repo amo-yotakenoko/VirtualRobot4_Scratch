@@ -19,6 +19,7 @@ class Scratch3NewBlocks {
         this.socket = null;
         this.response = {};
         this.id = 0;
+        this.robotId = "";
         this.virtualQueueCount = 0;
         this.httpURL = "http://localhost:8080/";
         setInterval(() => {
@@ -133,6 +134,22 @@ class Scratch3NewBlocks {
                     }),
                     arguments: {
 
+
+                    }
+                },
+                {
+                    opcode: 'setRobotId',
+                    blockType: BlockType.COMMAND,
+                    text: translation({
+                        ja: '操作するロボットのIdを[ID]に設定(WebGL版用)',
+                        en: 'Set robot id [ID] (for WebGL version)'
+                    }),
+
+                    arguments: {
+                        ID: {
+                            type: ArgumentType.STRING,
+                            defaultValue: "auto"
+                        },
 
                     }
                 },
@@ -512,6 +529,11 @@ class Scratch3NewBlocks {
 
     }
 
+    setRobotId(args) {
+        this.robotId = args.ID;
+        updateDevicesList();
+    }
+
     vr_set_key(args) {
         console.log("Scratch3NewBlocks.vr_set_key called");
         const message = {
@@ -544,10 +566,10 @@ class Scratch3NewBlocks {
     }
 
     sendMessage(message) {
-        console.log("Scratch3NewBlocks.sendMessage called");
+        message["robotId"] = this.robotId;
+        console.log("Scratch3NewBlocks.sendMessage called", message);
         if (this.readyState() == 1) {
             return new Promise(async (resolve) => {
-
 
 
                 console.log(message);
@@ -620,7 +642,8 @@ class Scratch3NewBlocks {
         const message = {
             type: "get",
             key: args.KEY,
-            id: this.id++
+            id: this.id++,
+            robotId: this.robotId
         };
         if (this.readyState(args) == 1) {
             console.log(message);
