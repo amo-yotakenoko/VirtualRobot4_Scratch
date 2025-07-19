@@ -2,11 +2,11 @@
  git clone --depth 1 https://github.com/llk/scratch-vm.git
  git clone --depth 1 https://github.com/llk/scratch-gui.git
 
- cd scratch-vm &&sudo npm install && npm link
+ cd scratch-vm && npm install && npm link
 
 cd ../
 
- cd scratch-gui &&sudo npm link scratch-vm && npm install
+ cd scratch-gui &&npm link scratch-vm && npm install
 
 
  npm install react react-dom
