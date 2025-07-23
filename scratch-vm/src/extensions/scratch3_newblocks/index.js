@@ -93,22 +93,22 @@ class Scratch3NewBlocks {
                         en: 'Refresh device menu'
                     })
                 },
-                {
-                    opcode: 'connect',
-                    blockType: BlockType.COMMAND,
-                    text: translation({
-                        ja: 'webSocketで接続[URL]',
-                        en: 'Connect via WebSocket [URL]'
-                    }),
+                // {
+                //     opcode: 'connect',
+                //     blockType: BlockType.COMMAND,
+                //     text: translation({
+                //         ja: 'webSocketで接続[URL]',
+                //         en: 'Connect via WebSocket [URL]'
+                //     }),
 
-                    arguments: {
-                        URL: {
-                            type: ArgumentType.STRING,
-                            defaultValue: "ws://localhost:12345"
-                        },
+                //     arguments: {
+                //         URL: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: "ws://localhost:12345"
+                //         },
 
-                    }
-                },
+                //     }
+                // },
                 {
                     opcode: 'connectHttp',
                     blockType: BlockType.COMMAND,
@@ -124,19 +124,19 @@ class Scratch3NewBlocks {
 
                     }
                 },
-                {
-                    opcode: 'readyState',
-                    blockType: BlockType.REPORTER,
+                // {
+                //     opcode: 'readyState',
+                //     blockType: BlockType.REPORTER,
 
-                    text: translation({
-                        ja: 'webSocketの接続状態',
-                        en: 'WebSocket connection state'
-                    }),
-                    arguments: {
+                //     text: translation({
+                //         ja: 'webSocketの接続状態',
+                //         en: 'WebSocket connection state'
+                //     }),
+                //     arguments: {
 
 
-                    }
-                },
+                //     }
+                // },
                 {
                     opcode: 'setRobotId',
                     blockType: BlockType.COMMAND,
@@ -529,9 +529,9 @@ class Scratch3NewBlocks {
 
     }
 
-    setRobotId(args) {
+    async setRobotId(args) {
         this.robotId = args.ID;
-        this.updateDevicesList();
+       return this.updateDevicesList();
     }
 
     vr_set_key(args) {
